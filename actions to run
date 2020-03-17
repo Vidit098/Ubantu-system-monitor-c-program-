@@ -1,0 +1,16 @@
+// this program is made with two functions
+listPid(s,U,S,v,c);
+//and
+endtask();
+// to run it the program is made with to case l&k
+// so run it with command
+./a.out -lk
+// here both the case will run one after the other
+./a.out -l
+//here only case l will run which contains listpid() funtion. which contains process id, process name, u-time,size
+./a.out -k
+// here only case k will run which contains endtask()
+// you have to enter the process id of the respective process.
+
+
+
