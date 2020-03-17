@@ -1,0 +1,190 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
+#include <math.h>
+
+#include <string.h>
+
+#include <dirent.h>
+#define buffersize 1024 // Define the buffersize to a large number
+
+/*
+ * Look through /proc to find the list of processes belonging to the user and
+ * print out any information that is needed.
+ */
+int main(int argc, char* argv[]) {
+    char choice;
+    char *token, *token1, *token2;
+    FILE *file;
+    // Default value of different options
+    int U = 1;
+    int s = 0;
+    int S = 0;
+    int v = 0;
+    int c = 1;
+    int p = 1;
+int space=0;
+
+    int pvalid = 0;   // flag to determine if user has entered -p option
+    int pcounter = 0; // count how many times -p option runs
+
+    // vars that store information about a process
+    int stime = 0;
+    int utime = 0;
+    int size = 0;
+    int pid = 0;
+    char stat[buffersize];
+    char cmdline[buffersize];
+    char cmdfinal[buffersize];
+int option;
+while ((option = getopt(argc,argv,"lk")) !=-1)
+{ switch (option)
+{ case 'l' :
+listPid(s,U,S,v,c);
+break;
+case 'k':
+endtask();
+break;
+
+}
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void listPid(int s, int U, int S, int v, int c)
+{
+struct dirent *entry;
+    DIR *dir;
+char *token, *cmdtoken, *token1 ,*token3;
+    FILE *file, *file1, *file2, *file3;
+ int utime = 0;
+int space=0;
+
+ // Open directoy failed
+    if ((dir = opendir("/proc")) == NULL){
+        perror("opendir() error");
+        return;
+ }
+    else
+{
+        // Read all the folders in /proc
+        while ((entry = readdir(dir)) != NULL){
+            // Filter out non-process folders
+            if(atoi(entry->d_name) != 0){
+
+                char path[buffersize];
+                strcpy(path, "/proc/");
+                strcat(path, entry->d_name);
+                strcat(path, "/status");
+
+                // Open the PID's status
+                file = fopen(path, "r");
+
+                char line[buffersize];
+                int i = 0; // Counter for line
+                // Read PID's status by lines
+                while (fgets(line, sizeof(line), file)) {
+                    i++;
+                    if(i == 9 )  // UID is located at line 9
+                    {
+                        strtok(line, "\t");
+                        // Store process's UID
+                        token = strtok(NULL, "\t");
+
+                        // Compare UID with user UID
+                        if((unsigned int)atoi(token) == (unsigned int)getuid()){
+                            char path[buffersize];
+                            strcpy(path, "/proc/");
+                            strcat(path, entry->d_name);
+                            strcat(path, "/stat");
+
+                            // Open PID's stat file
+                            file1 = fopen(path, "r");
+                            char statline[buffersize];
+                            // Read PID's stat
+                            fgets(statline, sizeof(statline), file1);
+                            token = strtok(statline, " ");
+                            for(int i=0; i<13; i++){
+                                token = strtok(NULL, " ");
+                            }
+  // Stroe utime
+                            utime = atoi(token);
+file2 = fopen(path, "r");
+char name[buffersize];
+
+fgets(name, sizeof(name), file2);
+token1 = strtok(name, " ");
+                            for(int i=0; i<1; i++){
+                                token1 = strtok(NULL, " ");
+                            }
+fclose(file1);
+fclose(file2);
+
+
+
+char size[buffersize];
+strcpy(size, "/proc/");
+strcat(size, entry->d_name);
+strcat(size, "/statm");
+file3 = fopen(size, "r");
+//Reading first line
+fgets(size, sizeof(size), file3);
+  token3 = strtok(size, " ");
+
+                        
+  space = token3;
+    fclose(file3);
+
+
+printf("%s: ",entry->d_name);
+printf("utime=%d ", utime);
+printf("%s",token1);
+printf("\t%skb",token3);
+
+
+printf("\n\n\n\n\n");
+
+ }
+                        break;
+                    }
+                }
+                fclose(file);
+            }
+        }
+        closedir(dir);
+        return;
+    }
+}
+
+
+
+
+
+endtask() // to kill the process by pid
+{
+printf("enter the PID");
+int tt;
+scanf("%d",&tt);
+kill(tt);
+
+
+}
+
+
+
+
+
+
